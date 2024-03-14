@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -18,6 +18,18 @@ class TestHTMLNode(unittest.TestCase):
         node3 = LeafNode(None, "This is a raw line")
         self.assertEqual(node3.to_html(), "This is a raw line")
         self.assertRaises(ValueError, lambda : LeafNode(None, None))
+
+    def test_parent(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+            )
+        self.assertEqual(node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
 
 
 if __name__ == "__main__":
