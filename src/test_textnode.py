@@ -37,9 +37,8 @@ class TestTextNode(unittest.TestCase):
     def test_repr(self):
         node = TextNode("This is a text node", text_type_bold)
         node2 = TextNode("This is another text node", text_type_italic, "http://127.0.0.1")
-        self.assertEqual(node.repr(), "TextNode(This is a text node, bold, None)")
-        self.assertEqual(node2.repr(), "TextNode(This is another text node, italic, http://127.0.0.1)")
-
+        self.assertEqual(repr(node), "TextNode(This is a text node, bold, None)")
+        self.assertEqual(repr(node2), "TextNode(This is another text node, italic, http://127.0.0.1)")
 
 if __name__ == "__main__":
     unittest.main()
