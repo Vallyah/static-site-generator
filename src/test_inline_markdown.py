@@ -96,6 +96,40 @@ class TestInlineMarkdown(unittest.TestCase):
         target = [("link", "https://www.example.com"), ("another", "https://www.example.com/another")]
         self.assertEqual(extract_markdown_links(text), target)
 
+    def test_split_no_image(self):
+        node = TextNode(
+            "This is text without an image",
+            text_type_text,
+        )
+        target_nodes = [
+            TextNode("This is text without an image", text_type_text),
+        ]
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(new_nodes, target_nodes)
+
+    def test_split_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)",
+            text_type_text,
+        )
+        target_nodes = [
+            TextNode("This is text with an ", text_type_text),
+            TextNode("image", text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+        ]
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(new_nodes, target_nodes)
+
+    def test_split_image_single(self):
+        node = TextNode(
+            "![image](https://www.example.com/image.png)",
+            text_type_text,
+        )
+        target_nodes = [
+            TextNode("image", text_type_image, "https://www.example.com/image.png"),
+        ]
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(new_nodes, target_nodes)
+
     def test_split_images(self):
         node = TextNode(
             "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
@@ -114,7 +148,7 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_split_links(self):
         node = TextNode(
-            "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)",
+            "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another) with text that follows",
             text_type_text,
         )
         target_nodes = [
@@ -122,6 +156,7 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("link", text_type_link, "https://www.example.com"),
             TextNode(" and ", text_type_text),
             TextNode("another", text_type_link, "https://www.example.com/another"),
+            TextNode(" with text that follows", text_type_text),
         ]
         new_nodes = split_nodes_link([node])
         self.assertListEqual(new_nodes, target_nodes)
