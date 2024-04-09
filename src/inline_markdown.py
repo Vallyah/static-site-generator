@@ -2,30 +2,33 @@ from textnode import (
     TextNode,
     text_type_text,
     text_type_image,
-    text_type_link
+    text_type_link,
+    text_type_bold,
+    text_type_code,
+    text_type_italic,
 )
 import re
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
-        print(isinstance(old_node, TextNode))
-        if not isinstance(old_node, TextNode):
+        if old_node.text_type != text_type_text:
             new_nodes.append(old_node)
-        else:
-            split_text = old_node.text.split(delimiter)
+            continue
 
-            if len(split_text) % 2 != 1:
-                raise Exception(f"Missing closing {delimiter} delimiter in text: {old_node.text}")
-            
-            use_old_type = True
-            for text in split_text:
-                if len(text) > 0:
-                    if use_old_type:
-                        new_nodes.append(TextNode(text, old_node.text_type))
-                    else:
-                        new_nodes.append(TextNode(text, text_type))
-                use_old_type = not use_old_type
+        split_text = old_node.text.split(delimiter)
+
+        if len(split_text) % 2 != 1:
+            raise Exception(f"Missing closing {delimiter} delimiter in text: {old_node.text}")
+        
+        use_old_type = True
+        for text in split_text:
+            if len(text) > 0:
+                if use_old_type:
+                    new_nodes.append(TextNode(text, old_node.text_type))
+                else:
+                    new_nodes.append(TextNode(text, text_type))
+            use_old_type = not use_old_type
                 
     return new_nodes
 
@@ -43,7 +46,7 @@ def split_nodes_image(old_nodes):
         if old_node.text_type != text_type_text:
             new_nodes.append(old_node)
             continue
-        
+
         remaining_text = old_node.text
         for image_tup in extract_markdown_images(old_node.text):
             split_text = remaining_text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
@@ -82,3 +85,11 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(remaining_text, text_type_text))
     
     return new_nodes
+
+def text_to_textnodes(text):
+    nodes = split_nodes_image([TextNode(text, text_type_text)])
+    nodes = split_nodes_link(nodes)
+    nodes = split_nodes_delimiter(nodes, "**", text_type_bold)
+    nodes = split_nodes_delimiter(nodes, "*", text_type_italic)
+    nodes = split_nodes_delimiter(nodes, "`", text_type_code)
+    return nodes
