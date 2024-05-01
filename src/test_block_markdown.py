@@ -13,5 +13,20 @@ class TestBlockMarkdown(unittest.TestCase):
         result = markdown_to_blocks(input)
         self.assertListEqual(expected, result)
 
+        input = """
+This is **bolded** paragraph
+
+
+
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items
+"""
+        result = markdown_to_blocks(input)
+        self.assertEqual(expected, result)
+
 if __name__ == "__main__":
     unittest.main()

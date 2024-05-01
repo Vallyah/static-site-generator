@@ -12,6 +12,6 @@ def markdown_to_blocks(markdown):
                 block_strings.append(line)
                 begin_new_block = False
             else:
-                block_strings[current_block_index] += "\n" + line
+                block_strings[current_block_index] += "\n" + line.strip()
 
     return block_strings
